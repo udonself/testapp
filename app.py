@@ -35,8 +35,13 @@ class TopArticles(Resource):
 
 
 class AddArticle(Resource):
-    def post(self, title: str, base64image: str, telegraphUrl: str):
-        succesful_add = db.addArticle(title, base64image, telegraphUrl)
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument("title")
+        parser.add_argument("base64image")
+        parser.add_argument("telegraphUrl")
+        params = parser.parse_args()
+        succesful_add = db.addArticle(params['title'], params['base64image'], params['telegraphUrl'])
         if succesful_add:
             return 'Article was succesfully added', 200
         return 'Article with such telegraph url already exist', 400
@@ -48,7 +53,7 @@ def main() -> None:
     api = Api(app)
     api.add_resource(Article, '/article/<url>')
     api.add_resource(TopArticles, '/top_articles')
-    api.add_resource(AddArticle, '/add_article/<title>/<base64image>/<telegraphUrl>')
+    api.add_resource(AddArticle, '/add_article')
     app.run(host='0.0.0.0')
     
 
